@@ -1,0 +1,24 @@
+version: "3"
+services:
+  sftp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sftp
+    restart: unless-stopped
+    cap_add:
+      - SYS_ADMIN
+    volumes:
+      # Shared drive.
+      - $PWD/data/share:/share
+      # Config files.
+      - $PWD/config/sshd_config:/etc/ssh/sshd_config:ro
+      - $PWD/data/users.conf:/etc/sftp/users.conf:ro
+      # Executables.
+      - $PWD/scripts/mount-share.sh:/etc/sftp.d/mount-share.sh:ro
+      - $PWD/scripts/create-sftp-user.sh:/usr/local/bin/create-sftp-user:ro
+      # Uncomment if private keys are generated.
+      # - $PWD/data/ssh_host_ed25519_key:/etc/ssh/ssh_host_ed25519_key
+      # - $PWD/data/ssh_host_rsa_key:/etc/ssh/ssh_host_rsa_key
+    ports:
+      - "2222:22"
